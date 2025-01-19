@@ -8,7 +8,7 @@ import (
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
 	if code >= 500 {
-		log.Printf("Responding with server error. Code: %d, Message: %s", code, msg)
+		log.Printf("Responding with server error: %s", msg)
 	}
 	type errorResponse struct {
 		Error string `json:"error"`
@@ -22,12 +22,12 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	dat, err := json.Marshal(payload)
 	if err != nil {
-		log.Printf("Error marshalling JSON: %s", err)
-		w.WriteHeader(http.StatusInternalServerError) // 500
+		log.Printf("Error marshalling JSON: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(code)
-	if n, err := w.Write(dat); err != nil {
-		log.Printf("Error writing response: %s (bytes written: %d)", err, n)
+	if _, err := w.Write(dat); err != nil {
+		log.Printf("Error writing response: %v", err)
 	}
 }
